@@ -1,0 +1,14 @@
+{
+  "domain": "kcwater_ha",
+  "name": "Kansas City Water",
+  "codeowners": ["@mholtzscher"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://www.home-assistant.io/integrations/kcwater_ha",
+  "homekit": {},
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "ssdp": [],
+  "version" : "0.0.1",
+  "zeroconf": []
+}

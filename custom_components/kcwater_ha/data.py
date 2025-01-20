@@ -5,21 +5,24 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from .api import KCWaterApiClient
+
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.loader import Integration
 
-    from .api import IntegrationBlueprintApiClient
-    from .coordinator import BlueprintDataUpdateCoordinator
+    from .api import KCWaterApiClient
+    from .coordinator import KCWaterUpdateCoordinator
 
 
-type IntegrationBlueprintConfigEntry = ConfigEntry[IntegrationBlueprintData]
+type KCWaterConfigEntry = ConfigEntry[KCWaterData]
 
 
 @dataclass
-class IntegrationBlueprintData:
+class KCWaterData:
     """Data for the Blueprint integration."""
 
-    client: IntegrationBlueprintApiClient
-    coordinator: BlueprintDataUpdateCoordinator
+    client: KCWaterApiClient
+    coordinator: KCWaterUpdateCoordinator
     integration: Integration
+    username: str
