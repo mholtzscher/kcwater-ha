@@ -3,7 +3,7 @@
   "name": "Kansas City Water",
   "codeowners": ["@mholtzscher"],
   "config_flow": true,
-  "dependencies": [],
+  "dependencies": ["recorder"],
   "documentation": "https://github.com/mholtzscher/kcwater-ha",
   "issue_tracker": "https://github.com/mholtzscher/kcwater-ha/issues",
   "homekit": {},
