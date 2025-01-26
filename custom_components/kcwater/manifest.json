@@ -1,5 +1,5 @@
 {
-  "domain": "kcwater_ha",
+  "domain": "kcwater",
   "name": "Kansas City Water",
   "codeowners": ["@mholtzscher"],
   "config_flow": true,
@@ -10,6 +10,6 @@
   "issue_tracker": "https://github.com/mholtzscher/kcwater-ha/issues",
   "requirements": [],
   "ssdp": [],
-  "version": "0.0.1",
+  "version": "0.1.0",
   "zeroconf": []
 }

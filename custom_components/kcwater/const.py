@@ -7,5 +7,5 @@ from logging import Logger, getLogger
 
 LOGGER: Logger = getLogger(__package__)
 
-DOMAIN = "kcwater_ha"
+DOMAIN = "kcwater"
 ATTRIBUTION = "Data provided by kcwater.us"

@@ -117,7 +117,7 @@ class KCWaterApiClient:
         self._username = username
         self._password = password
         self._session = session
-        self._account: Account
+        self._account: Account = None
 
     async def get_account_number(self) -> str:
         """Get the account ID."""
@@ -126,7 +126,8 @@ class KCWaterApiClient:
 
     async def async_login(self) -> None:
         """Login to the API."""
-        if self._account and self._account.token_exp > datetime.now():
+        tz = await dt_util.async_get_time_zone("America/Chicago")
+        if self._account and self._account.token_exp > datetime.now(tz=tz):
             _LOGGER.info("Token is still valid")
             return
         _LOGGER.info("Logging in with username: %s", self._username)
@@ -154,7 +155,8 @@ class KCWaterApiClient:
         self._account = Account(
             customer_id=auth_result["user"]["customerId"],
             access_token=auth_result["access_token"],
-            token_exp=datetime.now() + timedelta(seconds=auth_result["expires_in"]),
+            token_exp=datetime.now(tz=tz)
+            + timedelta(seconds=auth_result["expires_in"]),
             context=AccountContext(
                 account_number=customer_info["accountContext"]["accountNumber"],
                 service_id=customer_info["accountSummaryType"]["services"][0][

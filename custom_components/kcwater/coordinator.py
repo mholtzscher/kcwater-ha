@@ -16,6 +16,7 @@ from homeassistant.const import UnitOfVolume
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.recorder import get_instance
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, LOGGER
 
@@ -57,27 +58,33 @@ class KCWaterUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> Any:
         """Update data via library."""
         LOGGER.info("Updating data for %s", DOMAIN)
+        tz = await dt_util.async_get_time_zone("America/Chicago")
         account_number = (
             await self.config_entry.runtime_data.client.get_account_number()
         )
         consumption_statistic_id = f"{DOMAIN}:{account_number}_water_consumption"
         self._statistic_ids.add(consumption_statistic_id)
         last_stat = await get_instance(self.hass).async_add_executor_job(
-            get_last_statistics, self.hass, 1, consumption_statistic_id, True, set()
+            get_last_statistics,
+            self.hass,
+            1,
+            consumption_statistic_id,
+            True,  # noqa: FBT003
+            set(),
         )
         if not last_stat:
             LOGGER.debug("Updating statistic for the first time")
             usage: list[Reading] = []
-            start = datetime.now() - timedelta(days=31)
-            end = datetime.now() - timedelta(days=1)
+            start = datetime.now(tz=tz) - timedelta(days=31)
+            end = datetime.now(tz=tz)
             usage = await self.config_entry.runtime_data.client.async_get_data(
                 start, end
             )
             consumption_sum = 0.0
             last_stats_time = None
         else:
-            start = datetime.now() - timedelta(days=2)
-            end = datetime.now() - timedelta(days=1)
+            start = datetime.now(tz=tz) - timedelta(days=1)
+            end = datetime.now(tz=tz)
             usage = await self.config_entry.runtime_data.client.async_get_data(
                 start, end
             )
