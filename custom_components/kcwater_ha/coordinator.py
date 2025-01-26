@@ -52,16 +52,7 @@ class KCWaterUpdateCoordinator(DataUpdateCoordinator):
         def _dummy_listener() -> None:
             pass
 
-        # Force the coordinator to periodically update by registering at least one listener.
-        # Needed when the _async_update_data below returns {} for utilities that don't provide
-        # forecast, which results to no sensors added, no registered listeners, and thus
-        # _async_update_data not periodically getting called which is needed for _insert_statistics.
         self.async_add_listener(_dummy_listener)
-        # self.config_entry.async_on_unload(self._clear_statistics)
-
-    def _clear_statistics(self) -> None:
-        """Clear statistics."""
-        get_instance(self.hass).async_clear_statistics(list(self._statistic_ids))
 
     async def _async_update_data(self) -> Any:
         """Update data via library."""

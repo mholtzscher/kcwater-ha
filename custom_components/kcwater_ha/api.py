@@ -2,19 +2,18 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 import socket
 from asyncio import timeout
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from http import HTTPStatus
 from typing import Any
 
 import aiohttp
 from homeassistant.util import dt as dt_util
 
-TOKEN_URL = "https://my.kcwater.us/rest/oauth/token"
+TOKEN_URL = "https://my.kcwater.us/rest/oauth/token"  # noqa: S105
 CUSTOMER_INFO_URL = "https://my.kcwater.us/rest/account/customer/"
 HOURLY_USAGE_URL = "https://my.kcwater.us/rest/usage/month/day"
 DAILY_USAGE_URL = "https://my.kcwater.us/rest/usage/month"
@@ -27,13 +26,14 @@ class Account:
 
     customer_id: str
     access_token: str
-    token_exp: datetime.datetime
+    token_exp: datetime
     context: AccountContext
 
 
 @dataclass
 class AccountContext:
-    """A class used to represent a Customer.
+    """
+    A class used to represent a Customer.
 
     Attributes
     ----------
@@ -55,7 +55,8 @@ class AccountContext:
 
 @dataclass
 class Reading:
-    """A class to represent a water meter reading.
+    """
+    A class to represent a water meter reading.
 
     Attributes:
         readDateTime (datetime): The date and time when the reading was taken.
@@ -68,7 +69,7 @@ class Reading:
 
     """
 
-    read_datetime: datetime.datetime
+    read_datetime: datetime
     uom: str
     meter_number: str | None
     raw_consumption: float
@@ -116,7 +117,7 @@ class KCWaterApiClient:
         self._username = username
         self._password = password
         self._session = session
-        self._account: Account | None = None
+        self._account: Account
 
     async def get_account_number(self) -> str:
         """Get the account ID."""
@@ -125,7 +126,7 @@ class KCWaterApiClient:
 
     async def async_login(self) -> None:
         """Login to the API."""
-        if self._account and self._account.token_exp > datetime.datetime.now():
+        if self._account and self._account.token_exp > datetime.now():
             _LOGGER.info("Token is still valid")
             return
         _LOGGER.info("Logging in with username: %s", self._username)
@@ -153,8 +154,7 @@ class KCWaterApiClient:
         self._account = Account(
             customer_id=auth_result["user"]["customerId"],
             access_token=auth_result["access_token"],
-            token_exp=datetime.datetime.now()
-            + timedelta(seconds=auth_result["expires_in"]),
+            token_exp=datetime.now() + timedelta(seconds=auth_result["expires_in"]),
             context=AccountContext(
                 account_number=customer_info["accountContext"]["accountNumber"],
                 service_id=customer_info["accountSummaryType"]["services"][0][
@@ -163,9 +163,7 @@ class KCWaterApiClient:
             ),
         )
 
-    async def async_get_data(
-        self, start: datetime.datetime, end: datetime.datetime
-    ) -> list[Reading]:
+    async def async_get_data(self, start: datetime, end: datetime) -> list[Reading]:
         """Get data from the API."""
         _LOGGER.info(
             "Getting data for account: %s and range %s to %s",
@@ -197,7 +195,7 @@ class KCWaterApiClient:
                 headers={"Authorization": f"Bearer {self._account.access_token}"},
             )
             for r in result["history"]:
-                read_date = datetime.datetime.strptime(
+                read_date = datetime.strptime(
                     f"{r['readDate']} {r['readDateTime']}", "%m-%d-%Y %I %p"
                 ).replace(tzinfo=tz)
                 reading = Reading(
