@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-import logging
 from operator import attrgetter
 from typing import TYPE_CHECKING, Any, cast
 
@@ -18,10 +17,12 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.recorder import get_instance
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .api import Reading
 from .const import DOMAIN, LOGGER
 
 if TYPE_CHECKING:
+    import logging
+
+    from .api import Reading
     from .data import KCWaterConfigEntry
 
 
@@ -78,17 +79,21 @@ class KCWaterUpdateCoordinator(DataUpdateCoordinator):
             usage: list[Reading] = []
             start = datetime.now() - timedelta(days=31)
             end = datetime.now() - timedelta(days=1)
-            usage = await self.config_entry.runtime_data.client.async_get_data(start, end)
+            usage = await self.config_entry.runtime_data.client.async_get_data(
+                start, end
+            )
             consumption_sum = 0.0
             last_stats_time = None
         else:
             start = datetime.now() - timedelta(days=2)
             end = datetime.now() - timedelta(days=1)
-            usage = await self.config_entry.runtime_data.client.async_get_data(start, end)
+            usage = await self.config_entry.runtime_data.client.async_get_data(
+                start, end
+            )
             stats = await get_instance(self.hass).async_add_executor_job(
                 statistics_during_period,
                 self.hass,
-                min(usage,key=attrgetter('read_datetime')).read_datetime,
+                min(usage, key=attrgetter("read_datetime")).read_datetime,
                 None,
                 {consumption_statistic_id},
                 "hour",

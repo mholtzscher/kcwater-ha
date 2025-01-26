@@ -9,4 +9,3 @@ LOGGER: Logger = getLogger(__package__)
 
 DOMAIN = "kcwater_ha"
 ATTRIBUTION = "Data provided by kcwater.us"
-

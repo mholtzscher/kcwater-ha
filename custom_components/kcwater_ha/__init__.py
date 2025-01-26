@@ -11,7 +11,6 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_loaded_integration
 
 from .api import KCWaterApiClient
-
 from .const import DOMAIN, LOGGER
 from .coordinator import KCWaterUpdateCoordinator
 from .data import KCWaterData
@@ -40,7 +39,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: KCWaterConfigEntry) -> b
         ),
         integration=async_get_loaded_integration(hass, entry.domain),
         coordinator=coordinator,
-        username = entry.data[CONF_USERNAME],
+        username=entry.data[CONF_USERNAME],
     )
 
     await coordinator.async_config_entry_first_refresh()

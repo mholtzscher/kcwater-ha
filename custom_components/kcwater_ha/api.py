@@ -2,17 +2,16 @@
 
 from __future__ import annotations
 
-from asyncio import timeout
-from dataclasses import dataclass
 import datetime
-from datetime import timedelta
-from http import HTTPStatus
 import logging
 import socket
+from asyncio import timeout
+from dataclasses import dataclass
+from datetime import timedelta
+from http import HTTPStatus
 from typing import Any
 
 import aiohttp
-
 from homeassistant.util import dt as dt_util
 
 TOKEN_URL = "https://my.kcwater.us/rest/oauth/token"
@@ -154,7 +153,8 @@ class KCWaterApiClient:
         self._account = Account(
             customer_id=auth_result["user"]["customerId"],
             access_token=auth_result["access_token"],
-            token_exp=datetime.datetime.now() + timedelta(seconds=auth_result["expires_in"]),
+            token_exp=datetime.datetime.now()
+            + timedelta(seconds=auth_result["expires_in"]),
             context=AccountContext(
                 account_number=customer_info["accountContext"]["accountNumber"],
                 service_id=customer_info["accountSummaryType"]["services"][0][
@@ -163,19 +163,22 @@ class KCWaterApiClient:
             ),
         )
 
-    async def async_get_data(self, start:datetime.datetime, end:datetime.datetime ) -> list[Reading]:
+    async def async_get_data(
+        self, start: datetime.datetime, end: datetime.datetime
+    ) -> list[Reading]:
         """Get data from the API."""
         _LOGGER.info(
-            "Getting data for account: %s and range %s to %s", self._account.context.account_number, start, end
+            "Getting data for account: %s and range %s to %s",
+            self._account.context.account_number,
+            start,
+            end,
         )
         tz = await dt_util.async_get_time_zone("America/Chicago")
         readings: list[Reading] = []
-        for day in range((end-start).days):
+        for day in range((end - start).days):
             await self.async_login()
             query_date = start + timedelta(days=day)
-            formatted_date = query_date.strftime(
-                "%d-%b-%Y"
-            )
+            formatted_date = query_date.strftime("%d-%b-%Y")
             _LOGGER.info("Getting data for %s", formatted_date)
             payload = {
                 "customerId": str(self._account.customer_id),
