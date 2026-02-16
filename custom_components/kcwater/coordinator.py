@@ -136,3 +136,5 @@ class KCWaterUpdateCoordinator(DataUpdateCoordinator):
         async_add_external_statistics(
             self.hass, consumption_metadata, consumption_statistics
         )
+
+        return consumption_statistics

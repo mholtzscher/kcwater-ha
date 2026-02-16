@@ -117,20 +117,23 @@ class KCWaterApiClient:
         self._username = username
         self._password = password
         self._session = session
-        self._account: Account = None
+        self._account: Account | None = None
 
     async def get_account_number(self) -> str:
         """Get the account ID."""
         await self.async_login()
+        if self._account is None:
+            msg = "Account not initialized after login"
+            raise KCWaterApiClientError(msg)
         return self._account.context.account_number
 
     async def async_login(self) -> None:
         """Login to the API."""
         tz = await dt_util.async_get_time_zone("America/Chicago")
         if self._account and self._account.token_exp > datetime.now(tz=tz):
-            _LOGGER.info("Token is still valid")
+            _LOGGER.debug("Token is still valid")
             return
-        _LOGGER.info("Logging in with username: %s", self._username)
+        _LOGGER.debug("Logging in with username: %s", self._username)
         login_payload = {
             "username": str(self._username),
             "password": str(self._password),
@@ -167,7 +170,10 @@ class KCWaterApiClient:
 
     async def async_get_data(self, start: datetime, end: datetime) -> list[Reading]:
         """Get data from the API."""
-        _LOGGER.info(
+        if self._account is None:
+            msg = "Account not initialized. Call async_login first."
+            raise KCWaterApiClientError(msg)
+        _LOGGER.debug(
             "Getting data for account: %s and range %s to %s",
             self._account.context.account_number,
             start,
@@ -179,7 +185,7 @@ class KCWaterApiClient:
             await self.async_login()
             query_date = start + timedelta(days=day)
             formatted_date = query_date.strftime("%d-%b-%Y")
-            _LOGGER.info("Getting data for %s", formatted_date)
+            _LOGGER.debug("Getting data for %s", formatted_date)
             payload = {
                 "customerId": str(self._account.customer_id),
                 "accountContext": {
