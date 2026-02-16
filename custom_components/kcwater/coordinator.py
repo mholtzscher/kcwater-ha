@@ -98,7 +98,7 @@ class KCWaterUpdateCoordinator(DataUpdateCoordinator):
                 None,
                 {"sum"},
             )
-            consumption_sum = cast(float, stats[consumption_statistic_id][0]["sum"])
+            consumption_sum = cast("float", stats[consumption_statistic_id][0]["sum"])
             last_stats_time = stats[consumption_statistic_id][0]["start"]
 
         consumption_statistics = []
